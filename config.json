@@ -1,4 +1,4 @@
 {
-  "port": 8001,
-  "mongo_url": "mongodb://localhost:27017/testdb"
+  "port": 8000,
+  "mongo_url": "mongodb://localhost:27017/res2db"
 }
