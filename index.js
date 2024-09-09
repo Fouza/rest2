@@ -23,20 +23,20 @@ mongoose
         })
 
 
-        app.post('/users', async (req, res) => {
-            const body = req.body
-            console.log(body)
-            if (body.username && body.age && body.email) {
-                const user = await usersCollection.create(body)
-                if (user) {
-                    res.send({ success: true, message: "User created successfully" })
-                } else {
-                    res.send({ success: false, message: "Try again" })
-                }
-            } else {
-                res.send({ success: false, message: 'Please send user information' })
-            }
-        })
+        // app.post('/users', async (req, res) => {
+        //     const body = req.body
+        //     console.log(body)
+        //     if (body.username && body.age && body.email) {
+        //         const user = await usersCollection.create(body)
+        //         if (user) {
+        //             res.send({ success: true, message: "User created successfully" })
+        //         } else {
+        //             res.send({ success: false, message: "Try again" })
+        //         }
+        //     } else {
+        //         res.send({ success: false, message: 'Please send user information' })
+        //     }
+        // })
 
 
         app.listen(PORT, () => {
