@@ -33,7 +33,48 @@ export default ({ config, db }) => {
     })
 
 
+    router.get('/test', async (req, res) => {
+        const products = await productsCollection.aggregate([
+            {
+                $lookup: {
+                    from: 'orders',
+                    localField: '_id',
+                    foreignField: 'products.product_id',
+                    as: 'orders'
+                }
+            },
+
+        ])
+        res.send(products)
+    })
+
 
     return router
 
 }
+
+
+
+
+
+
+
+
+
+
+// {
+//     $project: {
+//         name: 1, // include other fields you want from the 'products' collection
+//             orders: {
+//             $map: {
+//                 input: '$orders',
+//                     as: 'order',
+//                             in: {
+//                     // specify the fields from 'orders' that you want to include
+//                     orderId: '$$order._id',  // example: include only the '_id' field
+//                         orderDate: '$$order.orderDate'  // example: include orderDate field
+//                 }
+//             }
+//         }
+//     }
+// },

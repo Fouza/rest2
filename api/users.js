@@ -10,30 +10,41 @@ export default ({ config, db }) => {
     //     res.send("Response")
     // })
 
-    //Fetch all users in DB
-    router.get('/', async (req, res) => {
+    //body, params, query
+
+    //Fetch users in DB
+    router.get('/:search_term', async (req, res) => {
+        // req.body
+        // req.params
+        // req.query
+        const { search_term } = req.params
+        const { age } = req.query
+        console.log(search_term, age)
+
         //Read
-        const users = await usersCollection.find()
+        // const users = await usersCollection.find() // Fetch All users
+        const users = await usersCollection.find({ username: { $regex: search_term }, ...age && { age: { $gte: age } } }, 'username age')
+
+        // const users = await usersCollection.find({ username: { $regex: search_term }, age: { $gte: 20 } }, 'username age', { skip: 5, limit: 1 })
+
         if (users) {
             res
-                .status(200)
-                .json(users)
+                .send({ success: true, users: users })
         } else {
             res
-                .status(500)
-                .json({ message: 'try again' })
+                .send({ success: false, message: 'Server Error' })
         }
     })
 
 
     //  /api/users/create
-    router.post('/create', async (req, res) => {
+    router.post('/', async (req, res) => {
         const body = req.body
         console.log(body)
         if (body.username && body.age && body.email) {
             const user = await usersCollection.create(body)
             if (user) {
-                res.send({ success: true, message: "User created successfully" })
+                res.send({ success: true, message: "User created successfully", user: user })
             } else {
                 res.send({ success: false, message: "Try again" })
             }
@@ -42,11 +53,25 @@ export default ({ config, db }) => {
         }
     })
 
-    router.post('/update', async (req, res) => {
-        //Update
+    router.put('/', async (req, res) => {
+        const body = req.body
+        const newUpdate = await usersCollection.updateOne({ email: body.email }, { username: body.username, age: body.age })
+        if (newUpdate) {
+            res.send({ success: true, user: newUpdate })
+        } else {
+            res.send({ success: false, message: 'Server Error' })
+        }
     })
 
-
+    router.put('/update_many', async (req, res) => {
+        const body = req.body
+        const newUpdate = await usersCollection.updateMany({ username: { $regex: body.username } }, { age: body.age })
+        if (newUpdate) {
+            res.send({ success: true, user: newUpdate })
+        } else {
+            res.send({ success: false, message: 'Server Error' })
+        }
+    })
 
     return router
 
