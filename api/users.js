@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { usersCollection } from "../models/index.js";
+import requestLogger from "../middlewares/requestLogger.js";
 
 export default ({ config, db }) => {
     let router = Router()
-
 
     // app.get('/', (req, res) => {
     //     console.log('Hello')
@@ -35,7 +35,6 @@ export default ({ config, db }) => {
                 .send({ success: false, message: 'Server Error' })
         }
     })
-
 
     //  /api/users/create
     router.post('/', async (req, res) => {

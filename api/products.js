@@ -5,14 +5,34 @@ export default ({ config, db }) => {
     let router = Router()
 
 
+    // Method, URL
     // app.get('/', (req, res) => {
     //     console.log('Hello')
     //     res.send("Response")
     // })
 
+    // GET, POST, DELETE, UPDATE, PUT
+
+
+    //  api/products
     router.get('/', async (req, res) => {
         //Read
-        const products = await productsCollection.find()
+        //body, params, query
+        // {
+        //     skip: 10,
+        //     limit: 10
+        // }
+        const { skip, limit } = req.query
+
+        const options = {}
+        if (skip) {
+            options.skip = skip
+        }
+        if (limit) {
+            options.limit = limit
+        }
+
+        const products = await productsCollection.find({}, 'username age', options) // {} {skip:10} {limit: 10} {skip: 10, limit: 10}
         if (products) {
             res
                 .status(200)
@@ -24,8 +44,43 @@ export default ({ config, db }) => {
         }
     })
 
-    router.post('/create', async (req, res) => {
+    // api/products/product_id
 
+    router.get('/:product_id', async (req, res) => {
+        const test = req.query
+        const product = await productsCollection.findById(req.query.product_id,)
+    })
+
+    //Retrive all product that have price > 30 (30 can be a parameter)
+    // /api/products/filter_by_price/ [0, 8888888888]
+    // /api/products/filter_by_price/0
+    // /api/products/filter_by_price/1
+    // /api/products/filter_by_price/2
+    // /api/products/filter_by_price/3
+    // ....etc..
+    router.get("/filter_by_price/:price", async (req, res) => {
+        const { price } = req.params
+
+        const result = await productsCollection.find({ price: { $gte: price } })
+        if (result) {
+            res.send({ success: true, response: result })
+        } else {
+            res.send({ success: false, message: "Try again" })
+        }
+    })
+
+    router.get("/filter_by_price", async (req, res) => {
+        const { price } = req.params
+        const result = await productsCollection.find({ price: { $gte: price } })
+        if (result) {
+            res.send({ success: true, response: result })
+        } else {
+            res.send({ success: false, message: "Try again" })
+        }
+    })
+
+    router.post('/create', async (req, res) => {
+        const data = req.body //null or undefined or {}
     })
 
     router.post('/update', async (req, res) => {

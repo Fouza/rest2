@@ -1,4 +1,6 @@
 {
   "port": 8000,
-  "mongo_url": "mongodb://localhost:27017/res2db"
+  "mongo_url": "mongodb://localhost:27017/res2db",
+  "api_key": "weerjweiutt289y3784twri35",
+  "corsOrigin": ["*"]
 }
