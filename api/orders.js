@@ -35,6 +35,16 @@ export default ({ config, db }) => {
     })
 
 
+    router.get('/test', async (req, res) => {
+        const orders = await ordersCollection.aggregate([
+            {
+                $unwind: '$products'
+            }
+        ])
+
+        res.send({ orders })
+    })
+
 
     return router
 

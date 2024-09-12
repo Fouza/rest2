@@ -4,7 +4,7 @@ const requestLogger = (req, res, next) => {
     //Verifies Sth
     //False
 
-    res.send({ message: 'Stop right there !' })
+    // res.send({ message: 'Stop right there !' })
 
     next();
 }

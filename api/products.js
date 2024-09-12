@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { productsCollection, usersCollection } from "../models/index.js";
+import moment from "moment"
 
 export default ({ config, db }) => {
     let router = Router()
@@ -46,7 +47,7 @@ export default ({ config, db }) => {
 
     // api/products/product_id
 
-    router.get('/:product_id', async (req, res) => {
+    router.get('/product_by_id/:product_id', async (req, res) => {
         const test = req.query
         const product = await productsCollection.findById(req.query.product_id,)
     })
@@ -103,6 +104,69 @@ export default ({ config, db }) => {
         res.send(products)
     })
 
+    //exo4
+    router.post('/psotnew', async (req, res) => {
+        const body = req.body;
+        try {
+            const product = await productsCollection.create(body);
+            res.send({ success: true, product });
+        } catch (err) {
+            res.send(err);
+        }
+
+    })
+
+    //Get products that have been ordered in the past month
+    router.get('/by_date/:month', async (req, res) => {
+        console.log(moment().subtract(1, 'month').toDate())
+        const { month } = req.params
+        try {
+            const products = await productsCollection.aggregate([
+                {
+                    $lookup: {
+                        from: 'orders',
+                        localField: '_id',
+                        foreignField: 'products.product_id',
+                        as: 'orders'
+                    }
+                },
+                {
+                    $unwind: '$orders'
+                },
+                {
+                    $unwind: '$orders.products'
+                },
+                {
+                    $match: {
+                        $expr: { $eq: ["$_id", "$orders.products.product_id"] }
+                    }
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        name: 1,
+                        'orders.createdAt': 1,
+                        'orders.products': 1
+                    }
+                },
+                {
+                    $match: {
+                        'orders.createdAt': { $gt: moment().subtract(month, 'month').toDate() }
+                    }
+                },
+                {
+                    $group: {
+                        _id: "$_id",
+                        sum_quantity: { $sum: "$orders.products.quantity" },
+                        grouped_orders: { $push: "$orders" }
+                    }
+                },
+            ])
+            res.send(products)
+        } catch (e) {
+            res.send(e)
+        }
+    })
 
     return router
 
